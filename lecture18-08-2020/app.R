@@ -74,9 +74,7 @@ ui <- fluidPage(
 server <- function(input, output) {
 
     output$scatterplot <- renderPlot({
-        # generate bins based on input$bins from ui.R
-        # x    <- faithful[, 2]
-        # bins <- seq(min(x), max(x), length.out = input$bins + 1)
+        
         print(input$year)
         print(input$genre)
         print(input$vote)
@@ -91,15 +89,7 @@ server <- function(input, output) {
                 filter(votes>input$vote) %>%
                 filter(year>=input$year[1] & year<=input$year[2])
         }
-        # plot_df<-shiny_movie_set  %>%
-        #         
-        #     filter(ifelse(input$genre!="All",,genre=input$genre))
-        #        
-        #     #filter(ifelse(input$genre=="All",,genre==input$genre)) %>%
-        #     filter(votes>input$vote) %>%
-        #     filter(year>=input$year[1] & year<=input$year[2])
-        
-        # draw the histogram with the specified number of bins
+     
         ggplot(plot_df,aes(x=length,y=rating,color=genre))+geom_point()
     })
 }
