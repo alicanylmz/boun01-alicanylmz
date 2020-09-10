@@ -12,3 +12,7 @@ You will see my work throughout the course on this file.
 ### Assignment 2
 
 [Homework2](https://pjournal.github.io/boun01-alicanylmz/Alicanhw2.html)
+
+### Assignment 3
+
+[Homework3](https://pjournal.github.io/boun01-alicanylmz/assignment-3.html)
