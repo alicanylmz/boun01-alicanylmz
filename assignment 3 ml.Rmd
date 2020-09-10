@@ -1,0 +1,242 @@
+---
+title: "ANALYSIS OF ESOPH AND YOUNG PEOPLE SURVEY DATASETS"
+author: "Alican Yılmaz"
+date: "9/9/2020"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    code_folding: show
+    theme: united
+    highlight: tango
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+library(stats)
+library(plotly)
+```
+
+
+In this study, I will try to get insights about the esoph data to see if (o)esophageal cancer is related to alcohol consumption, age or tobacco consumption, and will try to get meaning from Young People Survey’s Hobbies & Interests data by using some statistical methods and visualizations. For the data source, you can find the link at the end of the page. 
+
+# ESOPH ANALYSIS
+
+Esoph is R-Data from a case-control study of (o)esophageal cancer in Ille-et-Vilaine, France. Let's investigate it first!
+
+```{r data exploration}
+esoph_data<- esoph
+summary(esoph_data)
+```
+
+Our data consists of three categorical variables namely agegp, alcgp two numerical columns, ncases and ncontrols. Number of cases(ncases) ranges from 0 to 17 while number of controls(ncontrols) ranges from 1 to 60.
+
+
+```{r }
+str(esoph_data)
+```
+Here, we can see variable types better. `esoph_data` has 88 observations of 5 variables.
+
+## Understanding Total Number of Cases
+
+Below, you can see that the distribution of number of cancer cases are left skewed and 0 cases constitutes 29 of the cancer cases.
+
+```{r Plotting data,message=FALSE, warning=FALSE }
+a<-ggplot(esoph_data,aes(esoph_data$ncases))+geom_bar(fill="blue",alpha=0.5)+labs(x= 'Number of Cases', y= 'Count')
+plotly::ggplotly(a)
+```
+## Understanding Age Group and Percentage of Cancer Cases Relation
+
+Below, you can see that percentage of cancer cases tends to be higher when getting older. However, the highest cancer percentage is observed between 65-74 ages and lowest is observed between the 25-34 age group.
+
+```{r plotting data2, message=FALSE, warning=FALSE}
+b<-esoph_data %>% group_by(agegp)%>%
+  summarise(total_cases_by_age=sum(ncases),total_control_By_age=sum(ncontrols),perc=total_cases_by_age/total_control_By_age) %>%
+ggplot(.,aes(x=agegp, y=perc, fill=agegp)) +
+  labs(x="Age Group",y="Percentage of Cases",title="Relation between Percentage of Cancer Cases and Age Group")+ 
+  geom_bar(stat="identity", position = "dodge")+
+  theme(axis.text.x = element_text(size=7,vjust=0.4))+
+  guides(fill=guide_legend(title="Age Groups"))+
+  theme_minimal()
+plotly::ggplotly(b)
+```
+
+
+## Understanding Age-Group and Number of Cases Relation
+
+Below, you can see the distribution of the number of cases by all six age groups. The highest median is found to be 4 in 55-64 age group and maximum number of cases is observed as 17 in 65-74 age group. You can analyze the distribution details by scrolling through the each box blot. 
+
+```{r plotting data3,message=FALSE, warning=FALSE }
+c<-ggplot(esoph_data, aes(x=agegp, y=ncases, fill=agegp)) +
+  labs(x="Age Group",y="Number of Cases",title="Relation between Number of Cases and Age Group")+ 
+  geom_boxplot()+
+  theme(axis.text.x = element_text(size=7,vjust=0.4))+theme_minimal()
+plotly::ggplotly(c)
+```
+
+## Understanding Tobacco Consumption and Percentage of Cases Relation 
+
+Below, the tobacco consumption of each age group can be seen in six graphs. In the age groups of 45-54 and 55-64, the percentage of cancer cases are significantly higher when tobacco consumption is more than 30 g/day. In the age groups of 25-34 and 35-44, the number and percentage of cancer cases are observed significantly less than other groups.
+
+```{r plotting data4, message=FALSE, warning=FALSE}
+d<-esoph_data %>%  group_by(agegp,tobgp) %>%
+     summarise(total_cases = sum(ncases), total_controls = sum(ncontrols),percentage=total_cases/total_controls)
+
+d1<-ggplot(d,aes(x=tobgp,y=percentage,fill=tobgp))+
+    geom_bar(stat="identity")+
+    facet_wrap(~agegp,scales="fixed")+
+    guides(fill=guide_legend(title="Tobacco cons"))+
+    labs(title="Tobacco Consumption vs Percentage of Cancer Cases by Age Group",x="Tobacco Consumption", y= 'Percentage Of Cancer Cases')
+    
+plotly::ggplotly(d1)
+
+```
+
+## Understanding Alcohol Consumption and Percentage of Cases Relation 
+
+In the age groups of 25-34 and 35-44, contrary to tobacco consumption, when the alcohol consumption is higher than 120g/day, cancer can be observed. Again, in each age group, percentage of cancer cases tends to be proportional with the alcohol consumption per day. 
+```{r plotting data5, message=FALSE, warning=FALSE}
+e<-esoph %>%  group_by(agegp,alcgp) %>%
+     summarise(total_cases = sum(ncases), total_controls = sum(ncontrols),percentage=total_cases*100/total_controls)
+
+e1<-ggplot(e,aes(x=alcgp,y=percentage,fill=alcgp))+
+    geom_bar(stat="identity")+
+    facet_wrap(~agegp,scales="fixed")+
+    guides(fill=guide_legend(title="Alcohol cons"))+
+    labs(title="Alcohol Consumption vs Percentage of Cancer Cases by Age Group",x="Alcohol Consumption", y= 'Percentage Of Cancer Cases')
+    
+plotly::ggplotly(e1)
+
+```
+
+## Understanding Age Group and Number of Controls Relation 
+
+As can be seen from the box plots, number of controls tends to be lower in 25-34 and 75+ age group and maximum control number is observed in 35-44 age group. For a detailed information, you can scroll through the graphs. 
+
+```{r plotting data6, message=FALSE, warning=FALSE}
+f<-ggplot(esoph_data, aes(x=agegp, y=ncontrols, fill=agegp)) +
+  labs(x="Age Group",y="Number of Controls",title="Relation between Number of Controls and Age Group")+ 
+  geom_boxplot()+
+  theme(axis.text.x = element_text(size=7,vjust=0.4))+theme_minimal()
+plotly::ggplotly(f)
+```
+
+## Understanding Number of Cases over Number of Controls 
+
+Below, you can see number of cases over number of controls points are distributed along the lowest left corner of the plot. The outliers in both number of controls and number of cases can be seen better now. 
+
+```{r plotting data7, message=FALSE, warning=FALSE}
+g<-ggplot(esoph_data,aes(x=ncases,y=ncontrols,group=1,color=agegp))+
+  ggtitle(label="Number of Cases over Number of Controls")+
+  theme(plot.title = element_text(hjust=1))+
+  geom_point()+
+  theme_minimal() +
+  labs(x = "Number of Cases",y = "Number of Controls", color="Age group") +
+  theme(axis.text.x = element_text(size=7,vjust=0.4))
+plotly::ggplotly(g)
+```
+
+## Understanding the Effect of Alcohol and Tobacco 
+
+
+```{r}
+## effects of alcohol, tobacco and interaction, age-adjusted
+model1 <- glm(cbind(ncases, ncontrols) ~ agegp + tobgp * alcgp,
+              data = esoph, family = binomial())
+anova(model1)
+
+## Try a linear effect of alcohol and tobacco
+model2 <- glm(cbind(ncases, ncontrols) ~ agegp + unclass(tobgp)
+                                         + unclass(alcgp),
+              data = esoph, family = binomial())
+summary(model2)
+```
+Our median residuals is close to zero which means our model is not biased in one direction (i.e. the out come is neither over- nor underestimated). The contributions of age group and alcohol group to the deviance is higher than tobgp and both tobgp:alcgp, as can be seen from the first model.
+
+From the second generalized linear model, we can observe that agegp.L, tobgp and alcgp has a positive effect, whereas agegp.Q and agegp^5 has negative effect. tobgp, alcgp, agegp.L and agegp.Q are statistically significant. Null deviance is relatively higher than residual deviance, which is a good sign! This means using more than a single parameter explains the model better.
+
+
+# YOUNG PEOPLE SURVEY ANALYSIS
+
+First let's read the data.
+```{r read data}
+young_ppl_survey<-read.csv("responses.csv")
+
+```
+Now, we get the related columns that we will work on and clean the data.
+
+```{r get related columns}
+filtered_survey<-young_ppl_survey[,32:63]
+```
+
+
+```{r clean data}
+filtered_survey=filtered_survey[complete.cases(filtered_survey),]
+```
+
+Now, our data is ready for some interesting insights! First, let's see if we can reduce the dimensionality of this large data set while keeping as much information as possible. For that, we will use Principal Component Analysis(PCA).
+
+## Principal Component Analysis
+
+```{r correlation , echo=FALSE}
+#Correlation Matrix
+cor(filtered_survey[,1:6])
+
+```
+Here, we see that mathematics and physics are positively correlated, unsurprisingly!
+
+
+
+```{r principal component analysis}
+survey_pca <- princomp(as.matrix(filtered_survey),cor=T)
+summary(survey_pca,loadings=TRUE)
+
+```
+
+From the analysis, it can be observed that first 8 component explains more than %50 of the total variance. Reading affects first component positively while second component is affected by reading negatively. 
+
+```{r principal component graph,message=FALSE, warning=FALSE, echo=FALSE}
+ggplot(data.frame(pc=1:32,cum_var=c(0.1304833, 0.2325220, 0.31296072, 0.37993063, 0.42990854, 0.47376182, 0.50951029, 0.54435978, 0.57839615,0.61004306, 0.63881382, 0.66630271, 0.69342899, 0.71846315, 0.74225937, 0.76510928, 0.7867903,0.80693874, 0.82626082, 0.84466777,0.86216245, 0.87859422, 0.89437168, 0.91008294, 0.92499891,0.93850866, 0.95142748, 0.96301326, 0.9740915, 0.983607058, 0.992686432, 1.000000000)),aes(x=pc,y=cum_var)) + geom_point() + geom_line()+theme_minimal()
+```
+
+More than %80 of the variance is explained by only 20 principal components. Here, you can see the cumulative variance by principal components. 
+
+## Multidimensional Scaling
+
+In this part, in order to provide a good visual representation, we will use multidimensional scaling technique. The key here is the usage of correlation matrix as similarity measure. 
+
+
+```{r multidimensional scaling}
+#Set the seed for reproducibility
+set.seed(120)
+# Here 1 makes the distance values positive!
+yr_dist<- 1 - cor(filtered_survey)
+yr_mds <- cmdscale(yr_dist,k=2)
+#Provide column names
+colnames(yr_mds) <- c("x","y")
+print(yr_mds)
+```
+```{r multidimensional scaling1}
+ggplot(data.frame(yr_mds),aes(x=x,y=y)) + geom_text(label=rownames(yr_mds),angle=45,size=3)
+```
+
+Now, we have a better insight about the hobbies and interests of young people! As we figured out before, physics has close relationship with mathematics,although not as close as Science.and.technology and mathematics! Chemistry, medicine and biology also are three very close interests. Unsurprisingly again,  writing, art.exhibitions and theater have close relationship with each other.
+
+# References
+
+* [IE 48-A Lecture Notes](https://mef-bda503.github.io/archive/fall17/files/intro_to_ml.html)
+* [bıktık-R-tık Group Progress Journal](https://pjournal.github.io/boun01g-biktik-r-tik/analysis/GroupProject_Report_FinalVersion.html)
+* [Understanding Generalized Linear Model](https://www.datascienceblog.net/post/machine-learning/interpreting_generalized_linear_models/#:~:text=Thus%2C%20the%20deviance%20residuals%20are,GLMs%2C%20this%20is%20the%20deviance.)
+
+# Data Sources
+* *[Esoph](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/esoph)*
+* *[Young People Survey](https://www.kaggle.com/miroslavsabo/young-people-survey)*
+* *[R Documentation](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/topics/esoph)*
+
+
