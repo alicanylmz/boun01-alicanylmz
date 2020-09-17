@@ -16,3 +16,11 @@ You will see my work throughout the course on this file.
 ### Assignment 3
 
 [Homework3](https://pjournal.github.io/boun01-alicanylmz/assignment-3.html)
+
+### Final Assignment
+
+[Final Assignment](https://pjournal.github.io/boun01-alicanylmz/final-homework.pdf)
+
+### Group Works
+
+Don't forget to check out our [group works](https://pjournal.github.io/boun01g-biktik-r-tik/) for more!
