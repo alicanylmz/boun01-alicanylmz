@@ -17,9 +17,6 @@ You will see my work throughout the course on this file.
 
 [Homework3](https://pjournal.github.io/boun01-alicanylmz/assignment-3.html)
 
-### Final Assignment
-
-[Final Assignment](https://pjournal.github.io/boun01-alicanylmz/final-homework.pdf)
 
 ### Group Works
 
